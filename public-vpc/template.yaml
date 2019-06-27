@@ -1,0 +1,95 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Create vpc has 3 public subnets
+
+Resources:
+  # VPC
+  hansonVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: hansonVpc
+
+  # Subnet
+  publicSubnet1A:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.0.0/24
+      VpcId:
+        Ref: hansonVpc
+      AvailabilityZone: ap-northeast-1a
+      Tags:
+        - Key: Name
+          Value: hanson-public-subnet-1a
+  
+  publicSubnet1C:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.1.0/24
+      VpcId:
+        Ref: hansonVpc
+      AvailabilityZone: ap-northeast-1c
+      Tags:
+        - Key: Name
+          Value: hanson-public-subnet-1c
+
+  privateSubnet1A:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.2.0/24
+      VpcId: 
+        Ref: hansonVpc
+      AvailabilityZone: ap-northeast-1a
+      Tags:
+        - Key: Name
+          Value: hanson-public-subnet-1a
+
+  privateSubnet1C:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.3.0/24
+      VpcId:
+        Ref: hansonVpc
+      AvailabilityZone: ap-northeast-1c
+      Tags:
+        - Key: Name
+          Value: hanson-public-subnet-1c
+  
+  # Internet Gateway
+  hansonIgw:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: hanson-igw
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: hansonVpc
+      InternetGatewayId:
+        Ref: hansonIgw
+  
+  # RouteTable
+  hansonRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: hansonVpc
+      Tags:
+        - Key: Name
+          Value: hanson route table
+      
+  hansonRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: hansonRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: hansonIgw
